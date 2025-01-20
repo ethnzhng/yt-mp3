@@ -18,7 +18,7 @@ class YouTubeMP3Manager:
         self.artist = kwargs.get("artist")
         self.album = kwargs.get("album")
         self.volume = kwargs.get("volume")
-        self.use_thumbnail = kwargs.get("use_thumbnail")
+        self.no_cover_art = kwargs.get("no_cover_art")
         self.art_local = kwargs.get("art_local")
         self.art_url = kwargs.get("art_url")
 
@@ -45,12 +45,13 @@ class YouTubeMP3Manager:
             if self.album:
                 audio_file.tag.album = self.album
 
-            if self.art_local:
-                set_cover_art_from_local(tmpdir_path, audio_file, self.art_local)
-            elif self.art_url:
-                set_cover_art_from_url(tmpdir_path, audio_file, self.art_url)
-            elif self.use_thumbnail:
-                set_cover_art_from_thumbnail(tmpdir_path, audio_file)
+            if not self.no_cover_art:
+                if self.art_local:
+                    set_cover_art_from_local(tmpdir_path, audio_file, self.art_local)
+                elif self.art_url:
+                    set_cover_art_from_url(tmpdir_path, audio_file, self.art_url)
+                else:
+                    set_cover_art_from_thumbnail(tmpdir_path, audio_file)
 
             audio_file.tag.save()
 

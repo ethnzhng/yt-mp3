@@ -12,6 +12,7 @@ from .utils import (crop_image_to_square, download_image, spinner_decorator,
 @suppress_output
 @spinner_decorator("Downloading audio")
 def download_audio(tmpdir: Path, youtube_url: str, output_name: str = None) -> Path:
+    """Download the audio and use FFmpeg to convert it to MP3. (Spotify Local Files only supports MP3)"""
     ydl_opts = {
         "format": "bestaudio",
         "postprocessors": [

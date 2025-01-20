@@ -5,7 +5,15 @@ description = "Default template for PDM package"
 authors = [
     {name = "Ethan Zhang", email = "toners-dolce0a@icloud.com"},
 ]
-dependencies = []
+dependencies = [
+    "click>=8.1.0",
+    "yt-dlp>=2025.1.15",
+    "eyed3>=0.9.7",
+    "Pillow>=11.1.0",
+    "requests>=2.31.0",
+    "halo>=0.0.31",
+    "pydub>=0.25.1"
+]
 requires-python = ">=3.9"
 readme = "README.md"
 license = {text = "MIT"}
@@ -13,6 +21,12 @@ license = {text = "MIT"}
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+
+[project.scripts]
+yt-mp3 = "yt_mp3.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/yt_mp3"]
 
 [tool.pdm]
 distribution = true

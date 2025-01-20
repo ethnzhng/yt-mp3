@@ -14,18 +14,20 @@ from .utils import (crop_image_to_square, download_image, spinner_decorator,
 def download_audio(tmpdir: Path, youtube_url: str, output_name: str = None) -> Path:
     """Download the audio and use FFmpeg to convert it to MP3. (Spotify Local Files only supports MP3)"""
     ydl_opts = {
-        "format": "bestaudio",
+        "format": "bestaudio",  # Download best audio quality available
         "postprocessors": [
             {
-                "key": "FFmpegExtractAudio",
-                "preferredcodec": "mp3",
-                "preferredquality": "320",
+                "key": "FFmpegExtractAudio",  # Use FFmpeg to extract audio
+                "preferredcodec": "mp3",  # Encode to MP3
+                "preferredquality": "0",  # Encode at maximum quality VBR
             }
         ],
-        "writethumbnail": True,
-        # Default output name is the video title
-        "outtmpl": str(tmpdir / (output_name or "%(title)s")),
+        "writethumbnail": True,  # Dump thumbnail to file
+        "outtmpl": str(
+            tmpdir / (output_name or "%(title)s")  # Default filename is video title
+        ),
         "quiet": True,
+        "retries": 5,
     }
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
@@ -77,7 +79,6 @@ def set_cover_art_from_url(tmpdir: Path, audio_file, image_url: str):
 def set_cover_art_from_thumbnail(tmpdir: Path, audio_file):
     try:
         try:
-            # Thumbnail should have been dumped in the temp directory
             thumbnail_path = next(tmpdir.glob("*.webp")) or next(tmpdir.glob("*.jpg"))
         except StopIteration:
             raise FileNotFoundError("No thumbnail found")

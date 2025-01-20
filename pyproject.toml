@@ -1,0 +1,18 @@
+[project]
+name = "yt-mp3"
+version = "0.1.0"
+description = "Default template for PDM package"
+authors = [
+    {name = "Ethan Zhang", email = "toners-dolce0a@icloud.com"},
+]
+dependencies = []
+requires-python = ">=3.9"
+readme = "README.md"
+license = {text = "MIT"}
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.pdm]
+distribution = true

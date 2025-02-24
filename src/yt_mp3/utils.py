@@ -81,3 +81,41 @@ def download_image(url: str, output_path: Path) -> Path:
         return output_path
     except (requests.RequestException, IOError) as e:
         raise RuntimeError(f"Failed to download image: {str(e)}")
+
+
+def parse_timestamp(time_str: str | None) -> int | None:
+    """Convert time string to milliseconds. Accepts:
+    - Seconds: "90", "90.5"
+    - MM:SS: "1:30", "1:30.5"
+    - HH:MM:SS: "1:01:45", "1:01:45.5"
+    """
+    if not time_str:
+        return None
+
+    try:
+        if ":" not in time_str:
+            seconds = float(time_str)
+            if seconds < 0:
+                raise ValueError("Negative time not allowed")
+            return int(seconds * 1000)
+
+        parts = time_str.split(":")
+        if len(parts) > 3:
+            raise ValueError("Too many time components")
+
+        if len(parts) == 3:
+            h, m, s = map(float, parts)
+            if h < 0 or m < 0 or s < 0 or m >= 60 or s >= 60:
+                raise ValueError("Invalid time values")
+            return int((h * 3600 + m * 60 + s) * 1000)
+
+        if len(parts) == 2:
+            m, s = map(float, parts)
+            if m < 0 or s < 0 or s >= 60:
+                raise ValueError("Invalid time values")
+            return int((m * 60 + s) * 1000)
+
+    except ValueError as e:
+        raise ValueError(
+            f"Invalid time format: {time_str}. Use seconds, MM:SS, or HH:MM:SS"
+        )

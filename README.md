@@ -2,6 +2,7 @@
 
 A simple and user-friendly CLI tool for downloading a YouTube video as an MP3 file (in maximum quality), and optionally applying helpful modifications to the output file, including:
 - Adjusted volume
+- Set start and end timestamps for trimming
 - Metadata:
   - Track title
   - Artist
@@ -59,4 +60,14 @@ yt-mp3 \
     --album "covers" \
     --volume 3.0 \
     "https://www.youtube.com/watch?v=hsyM2Pp3v2U"
+```
+
+### Development
+
+```sh
+# Install in develop mode
+pip install --editable .
+
+# Format code
+ruff check --select I --fix . && ruff format .
 ```

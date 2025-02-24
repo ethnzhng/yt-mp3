@@ -38,6 +38,16 @@ from .yt_mp3 import YouTubeMP3Manager
     help="Path to local image file for cover art.",
 )
 @click.option("--art-url", "-u", help="URL to image for cover art.")
+@click.option(
+    "--start-time",
+    "-s",
+    help="Start time (seconds, MM:SS, or HH:MM:SS)",
+)
+@click.option(
+    "--end-time",
+    "-e",
+    help="End time (seconds, MM:SS, or HH:MM:SS)",
+)
 def main(**kwargs):
     try:
         executor = YouTubeMP3Manager(**kwargs)

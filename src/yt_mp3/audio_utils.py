@@ -1,12 +1,17 @@
 from math import log10
 from pathlib import Path
 
+import click
 import eyed3
 import yt_dlp
 from pydub import AudioSegment
 
-from .utils import (crop_image_to_square, download_image, spinner_decorator,
-                    suppress_output)
+from .utils import (
+    crop_image_to_square,
+    download_image,
+    spinner_decorator,
+    suppress_output,
+)
 
 
 @suppress_output
@@ -90,6 +95,38 @@ def set_cover_art_from_thumbnail(tmpdir: Path, audio_file):
         _embed_image_in_tag(audio_file.tag, tmp_art_path)
     except Exception as e:
         raise RuntimeError(f"Failed to set cover art from thumbnail: {str(e)}")
+
+
+@spinner_decorator("Trimming audio")
+def trim_audio(tmpdir: Path, file_path: Path, start_ms: int | None, end_ms: int | None):
+    """Trim audio file based on start and end timestamps."""
+    if start_ms is None and end_ms is None:
+        return
+
+    temp_file = tmpdir / "trimmed.mp3"
+    try:
+        audio = AudioSegment.from_file(file_path)
+        duration_ms = len(audio)
+
+        # Validate timestamps
+        if start_ms and start_ms < 0:
+            click.echo("Warning: Negative start time provided, using 0:00")
+            start_ms = 0
+        if end_ms and end_ms > duration_ms:
+            click.echo(f"Warning: End time exceeds duration, using full length")
+            end_ms = duration_ms
+        if start_ms and end_ms and start_ms >= end_ms:
+            click.echo("Warning: Start time >= end time, skipping trim")
+            return
+
+        start = start_ms if start_ms is not None else 0
+        end = end_ms if end_ms is not None else duration_ms
+        audio = audio[start:end]
+
+        audio.export(temp_file, format="mp3")
+        temp_file.replace(file_path)
+    except Exception as e:
+        raise RuntimeError(f"Failed to trim audio: {str(e)}")
 
 
 def _embed_image_in_tag(tag, image_path: Path):

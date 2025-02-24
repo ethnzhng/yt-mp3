@@ -3,10 +3,15 @@ from pathlib import Path
 
 import eyed3
 
-from .audio_utils import (adjust_volume, download_audio,
-                          set_cover_art_from_local,
-                          set_cover_art_from_thumbnail, set_cover_art_from_url)
-from .utils import check_youtube_url, ensure_dir
+from .audio_utils import (
+    adjust_volume,
+    download_audio,
+    set_cover_art_from_local,
+    set_cover_art_from_thumbnail,
+    set_cover_art_from_url,
+    trim_audio,
+)
+from .utils import check_youtube_url, ensure_dir, parse_timestamp
 
 
 class YouTubeMP3Manager:
@@ -21,6 +26,8 @@ class YouTubeMP3Manager:
         self.no_cover_art = kwargs.get("no_cover_art")
         self.art_local = kwargs.get("art_local")
         self.art_url = kwargs.get("art_url")
+        self.start_time = kwargs.get("start_time")
+        self.end_time = kwargs.get("end_time")
 
     def download_and_process_mp3(self) -> Path:
         """Download the audio from the YouTube URL and apply processing/metadata."""
@@ -29,6 +36,12 @@ class YouTubeMP3Manager:
             tmp_mp3_path = download_audio(
                 tmpdir_path, self.youtube_url, self.output_name
             )
+
+            start_ms = parse_timestamp(self.start_time)
+            end_ms = parse_timestamp(self.end_time)
+
+            if start_ms is not None or end_ms is not None:
+                trim_audio(tmpdir_path, tmp_mp3_path, start_ms, end_ms)
 
             audio_file = eyed3.load(tmp_mp3_path)
             if not audio_file:
